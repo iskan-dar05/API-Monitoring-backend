@@ -12,16 +12,21 @@ class ProxyController extends Controller
         $start = microtime(true);
 
 
-
         if(!filter_var($request->url, FILTER_VALIDATE_URL)) {
             return response()->json(['error' => 'Invalid URL'], 400);
         }
 
+        $headers = collect($request->headers->all())->except(['host', 'content-length'])->map(fn($v) => $v[0])->toArray();
+
+        $headers['User-Agent'] = 'Mozilla/5.0';
+        $headers['Accept'] = 'application/json';
+
         // Send request to external API
-        $response = Http::withHeaders($request->headers ?? [])
-            ->send($request->method, $request->url, [
-                'json'=>$request->body
+        $response = Http::withHeaders($headers)
+            ->send($request->method(), $request->url, [
+                'json'=>$request->input('body', [])
             ]);
+
 
         $responseBody = $response->body();
 
@@ -33,7 +38,7 @@ class ProxyController extends Controller
         $duration = microtime(true) - $start;
         // Log outgoing request
         ApiLog::create([
-            'method' => $request->method,
+            'method' => $request->method(),
             'url' => $request->url,
             'headers' => json_encode($request->headers),
             'body' => json_encode($request->body),

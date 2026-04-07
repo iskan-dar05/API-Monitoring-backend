@@ -20,6 +20,7 @@ class LogApiRequests
         $response = $next($request);
         $duration = microtime(true) - $start;
 
+
         $responseContent= $response->getContent();
 
         if(strlen($responseContent) > 5000){
@@ -38,6 +39,9 @@ class LogApiRequests
             'duration'=>$duration * 1000,
             'type' => 'incoming'
         ]);
+
+
+        
 
         return $response;
     }
