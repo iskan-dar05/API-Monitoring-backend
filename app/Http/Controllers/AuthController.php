@@ -18,6 +18,13 @@ class AuthController extends Controller
 			"password"=>"required|min:8"
 		]);
 
+
+		if (User::where('email', $request->email)->exists()) {
+	        return response()->json([
+	            "message" => "Email already exists"
+	        ], 409); // conflict
+    	}
+
 		$dt = Carbon::now();
 		$join_date = $dt->toDayDateTimeString();
 		$user = new User();
@@ -40,39 +47,30 @@ class AuthController extends Controller
 		]);
 
 		try{
-			$email = $request->email;
-			$password = $request->password;
+			
+			$credentials = [
+			    'email' => $request->email,
+			    'password' => $request->password
+			];
 
-
-			if(Auth::attempt(['email' => $email, 'password' => $password]))
-			{
-				$user = Auth::User();
-				$accessToken = $user->createToken($user->email)->accessToken;
-
-				$data = []
-
-				$data['response_code'] = '200';
-				$data['status'] = 'success';
-				$data['message'] = 'success Login';
-				$data['user_infor'] = $user;
-				$data['token'] = $accessToken;
-
-				return response()->json($data);
-			}else{
-				$data = [];
-				$data['response_code'] = '401';
-				$data['status'] = 'error';
-				$data['message'] = 'fail Login';
-				return response()->json($data);
+			if(!Auth::attempt($credentials)) {
+				return response()->json([
+					'message' => 'Invalid credentials'
+				], 401);
 			}
+
+			$request->session()->regenerate();
+			$user = Auth::user();
+			return response()->json([
+		        'message' => 'Login successful',
+		        "user" => $user
+		    ]);
+
 		}catch(\Exception $e){
 			\Log::info($e);
-			$data = [];
-			$data['response_code'] = '401';
-			$data['status'] = 'error';
-			$data['message'] = 'fail Login';
-
-			return response()->json($data);
+			return response()->json([
+            	'message' => 'Server error'
+        	], 500);
 		}
 
 	}
