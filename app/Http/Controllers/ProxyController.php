@@ -38,6 +38,7 @@ class ProxyController extends Controller
         $duration = microtime(true) - $start;
         // Log outgoing request
         ApiLog::create([
+            'user_id' => auth()->id(),
             'method' => $request->method(),
             'url' => $request->url,
             'headers' => json_encode($request->headers),
@@ -52,7 +53,8 @@ class ProxyController extends Controller
             'status' => $response->status(),
             'body' => json_decode($response->body(), true),
             'headers' => $response->headers(),
-            'message' => 'SALAM ALAYKOUM'
+            'message' => 'SALAM ALAYKOUM',
+            "time" => $duration
         ]);
 
 
