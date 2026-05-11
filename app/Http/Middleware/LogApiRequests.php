@@ -28,8 +28,10 @@ class LogApiRequests
         }
 
 
+
         // Log data
         ApiLog::create([
+            'user_id'=>auth()->id(),
             'method'=>$request->method(),
             'url'=>$request->fullUrl(),
             'headers'=>json_encode($request->headers->all()),
@@ -46,3 +48,4 @@ class LogApiRequests
         return $response;
     }
 }
+

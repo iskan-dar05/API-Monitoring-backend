@@ -34,7 +34,6 @@ class ProxyController extends Controller
             $responseBody = substr($responseBody, 0, 5000) . '...';
         }
 
-
         $duration = microtime(true) - $start;
         // Log outgoing request
         ApiLog::create([

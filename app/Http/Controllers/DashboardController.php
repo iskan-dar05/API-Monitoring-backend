@@ -56,7 +56,7 @@ class DashboardController extends Controller
             "errorRate"=>$errorRate,
             "rpm"=>$rpm,
             "trafficOverview"=>$trafficOverview,
-            "latencyTrends"=>$latencyTrends
+            "latencyTrends"=>$latencyTrends,
         ]);
 
     }
