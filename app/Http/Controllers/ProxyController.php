@@ -16,7 +16,8 @@ class ProxyController extends Controller
             return response()->json(['error' => 'Invalid URL'], 400);
         }
 
-        $headers = collect($request->headers->all())->except(['host', 'content-length'])->map(fn($v) => $v[0])->toArray();
+        // $headers = collect($request->headers->all())->except(['host', 'content-length'])->map(fn($v) => $v[0])->toArray();
+        $headers = $request->input('headers', []);
 
         $headers['User-Agent'] = 'Mozilla/5.0';
         $headers['Accept'] = 'application/json';
@@ -40,8 +41,8 @@ class ProxyController extends Controller
             'user_id' => auth()->id(),
             'method' => $request->method(),
             'url' => $request->url,
-            'headers' => json_encode($request->headers),
-            'body' => json_encode($request->body),
+            'headers' => json_encode($request->input('headers')),
+            'body' => json_encode($request->input('body')),
             'response' => $response->body(),
             'status' => $response->status(),
             'duration' => $duration * 1000,
@@ -53,7 +54,7 @@ class ProxyController extends Controller
             'body' => json_decode($response->body(), true),
             'headers' => $response->headers(),
             'message' => 'SALAM ALAYKOUM',
-            "time" => $duration
+            "time" => $duration,
         ]);
 
 

@@ -42,13 +42,18 @@ class DashboardController extends Controller
          ->orderBy('hour')
          ->get();
 
-         $rpm = ApiLog::select(
+        $rpm = ApiLog::select(
             DB::raw("strftime('%Y-%m-%d %H:%M:00', created_at) as minute"),
             DB::raw("count(*) as requests_per_minute")
          )->where('type', 'incoming')
           ->groupBy('minute')
             ->orderBy('minute')
             ->get();
+
+
+        $logs = ApiLog::select('id', 'method', 'url', 'status', 'duration', 'headers', 'body', 'created_at')->where('user_id', auth()->id())->where('type', 'outgoing')->get();
+
+
 
         return response()->json([
             "totalRequests"=>$totalRequests,
@@ -57,6 +62,7 @@ class DashboardController extends Controller
             "rpm"=>$rpm,
             "trafficOverview"=>$trafficOverview,
             "latencyTrends"=>$latencyTrends,
+            "logs"=>$logs
         ]);
 
     }
